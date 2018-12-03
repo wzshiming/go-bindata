@@ -177,23 +177,15 @@ func header_uncompressed_nomemcopy(w io.Writer) error {
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"time"
 	"unsafe"
 )
 
 func bindataRead(data, name string) ([]byte, error) {
-	var empty [0]byte
-	sx := (*reflect.StringHeader)(unsafe.Pointer(&data))
-	b := empty[:]
-	bx := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	bx.Data = sx.Data
-	bx.Len = len(data)
-	bx.Cap = bx.Len
+	b := *(*[]byte)(unsafe.Pointer(&data))
 	return b, nil
 }
-
 `)
 	return err
 }
