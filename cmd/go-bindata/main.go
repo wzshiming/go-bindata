@@ -5,13 +5,13 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	flag "github.com/spf13/pflag"
 	"github.com/wzshiming/go-bindata"
 )
 
@@ -31,7 +31,6 @@ func main() {
 // This function exits the program with an error, if
 // any of the command line options are incorrect.
 func parseArgs() *bindata.Config {
-	var version bool
 
 	c := bindata.NewConfig()
 
@@ -50,11 +49,10 @@ func parseArgs() *bindata.Config {
 	flag.BoolVar(&c.NoMetadata, "nometadata", c.NoMetadata, "Assets will not preserve size, mode, and modtime info.")
 	flag.UintVar(&c.Mode, "mode", c.Mode, "Optional file mode override for all files.")
 	flag.Int64Var(&c.ModTime, "modtime", c.ModTime, "Optional modification unix timestamp override for all files.")
-	flag.StringVar(&c.Output, "o", c.Output, "Optional name of the output file to be generated.")
-	flag.BoolVar(&version, "version", false, "Displays version information.")
+	flag.StringVarP(&c.Output, "output", "o", c.Output, "Optional name of the output file to be generated.")
 
 	ignore := make([]string, 0)
-	flag.Var((*AppendSliceValue)(&ignore), "ignore", "Regex pattern to ignore")
+	flag.StringSliceVar(&ignore, "ignore", nil, "Regex pattern to ignore")
 
 	flag.Parse()
 
@@ -63,11 +61,6 @@ func parseArgs() *bindata.Config {
 		patterns = append(patterns, regexp.MustCompile(pattern))
 	}
 	c.Ignore = patterns
-
-	if version {
-		fmt.Printf("%s\n", Version())
-		os.Exit(0)
-	}
 
 	// Make sure we have input paths.
 	if flag.NArg() == 0 {
